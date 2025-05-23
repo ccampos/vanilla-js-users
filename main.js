@@ -19,15 +19,18 @@ function getUsers() {
 function render(users) {
   const cardList = document.createElement('div');
   for (const user of users) {
+    const col = document.createElement('div');
+    col.className = 'col-12 col-md-6 col-lg-4';
     const card = document.createElement('div');
     const cardHeader = document.createElement('p');
     card.className = 'card';
-    card.classList.add('mb-2');
+    card.classList.add('mb-2', 'h-100');
     cardHeader.className = 'card-text';
     cardHeader.textContent = user.name;
     cardHeader.classList.add('p-2');
     card.appendChild(cardHeader);
-    cardList.appendChild(card);
+    col.appendChild(card);
+    cardList.appendChild(col);
   }
   const container = document.querySelector('#user-list');
   container.innerHTML = '';
