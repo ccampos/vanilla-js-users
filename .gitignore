@@ -1,0 +1,25 @@
+# Node dependencies
+node_modules/
+
+# TypeScript output
+*.js
+*.js.map
+
+# SASS output
+*.css
+*.css.map
+
+# Logs
+npm-debug.log*
+yarn-debug.log*
+yarn-error.log*
+
+# VS Code settings
+.vscode/
+
+# macOS metadata
+.DS_Store
+
+# Compiled output (if using a dist or build folder)
+dist/
+build/
