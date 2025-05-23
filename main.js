@@ -55,3 +55,34 @@ function setInputListener() {
 
 getUsers();
 setInputListener();
+
+// Testing Definition
+function assertEquals(actual, expected, description) {
+  const passed = JSON.stringify(actual) === JSON.stringify(expected);
+  if (passed) {
+    console.log(`Passed! ${description}`);
+  } else {
+    console.error(`Failed ${description}`);
+    console.error(`Expected: ${JSON.stringify(expected)}`);
+    console.error(`Got: ${JSON.stringify(actual)}`);
+  }
+}
+
+// Run Tests
+const sampleUsers = [
+  { name: "Alice" },
+  { name: "Holly" },
+  { name: "Zendaya" }
+];
+
+assertEquals(
+  filterUsers(sampleUsers, "ho"),
+  [{ name: "Holly" }],
+  'filters users by partial match'
+)
+
+assertEquals(
+  filterUsers(sampleUsers, "bo"),
+  [],
+  'filters for non existant user'
+)
