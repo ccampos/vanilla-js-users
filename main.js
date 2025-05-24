@@ -1,5 +1,5 @@
-/** @type {Array<{ name: string; email: string; address: { street: string; city: string } }>} */
-let allUsers;
+const searchInput = document.getElementById("searchInput");
+let currentListener;
 
 function getUsers() {
   fetch('https://jsonplaceholder.typicode.com/users')
@@ -11,8 +11,8 @@ function getUsers() {
       return response.json();
     })
     .then((users) => {
-      allUsers = users;
-      render(allUsers);
+      render(users);
+      setInputListener(users);
     })
 }
 
@@ -44,19 +44,25 @@ function filterUsers(users, query) {
   });
 }
 
-function setInputListener() {
-  const input = document.querySelector('#searchInput');
-  input.addEventListener('input', () => {
-    const query = input.value;
-    const filteredUsers = filterUsers(allUsers, query);
-    render(filteredUsers);
-  });
+
+function setInputListener(users) {
+  if (currentListener) {
+    searchInput.removeEventListener('input', currentListener);
+  }
+
+  currentListener = function () {
+    const query = searchInput.value;
+    const filtered = filterUsers(users, query);
+    render(filtered);
+  };
+
+  searchInput.addEventListener('input', currentListener);
 }
 
-getUsers();
-setInputListener();
 
-// Testing Definition
+getUsers();
+
+// Unit Testing Definition
 function assertEquals(actual, expected, description) {
   const passed = JSON.stringify(actual) === JSON.stringify(expected);
   if (passed) {
@@ -68,21 +74,56 @@ function assertEquals(actual, expected, description) {
   }
 }
 
-// Run Tests
+// Run Unit Tests
 const sampleUsers = [
   { name: "Alice" },
   { name: "Holly" },
   { name: "Zendaya" }
 ];
 
-assertEquals(
-  filterUsers(sampleUsers, "ho"),
-  [{ name: "Holly" }],
-  'filters users by partial match'
-)
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+  assertEquals(
+    filterUsers(sampleUsers, "ho"),
+    [{ name: "Holly" }],
+    'filters users by partial match'
+  );
 
-assertEquals(
-  filterUsers(sampleUsers, "bo"),
-  [],
-  'filters for non existant user'
-)
+  assertEquals(
+    filterUsers(sampleUsers, "bo"),
+    [],
+    'filters for non existant user'
+  );
+}
+
+// Integration Test Definition
+function runIntegrationTest() {
+  const testName = "Integration: filters visible user cards by name";
+
+  const mockUsers = [
+    { name: "Alice", email: "alice@mail.com", address: { city: "Springfield" } },
+    { name: "Bob", email: "bob@mail.com", address: { city: "Metropolis" } },
+    { name: "Charlie", email: "charlie@mail.com", address: { city: "Gotham" } },
+  ];
+
+  render(mockUsers); // injects mock data into DOM
+  setInputListener(mockUsers);
+
+  searchInput.value = "bob";
+  searchInput.dispatchEvent(new Event("input"));
+
+  const cards = document.querySelectorAll("#user-list .card");
+  const names = Array.from(cards).map(c => c.textContent.trim().toLowerCase());
+
+  if (cards.length === 1 && names[0].includes("bob")) {
+    console.log(`✅ ${testName}`);
+  } else {
+    console.error(`❌ ${testName}`);
+    console.error(`   Expected 1 result with 'Bob', got:`, names);
+  }
+  searchInput.value = "";
+}
+
+// Run Integration Tests
+if (location.hostname === "localhost" || location.hostname === "127.0.0.1") {
+  runIntegrationTest();
+}
